@@ -1,0 +1,31 @@
+services:
+  mariadb:
+    build:
+      context: /home/tlupu/inception/srcs/requirements/mariadb
+      dockerfile: Dockerfile
+    container_name: mariadb
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/tlupu/data/mariadb_vol:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      # Do NOT pass secret file paths here!
+    env_file:
+      - .env
+    networks:
+      - dracula_net
+    secrets:
+      - db_root_pass
+      - db_pass
+
+secrets:
+  db_root_pass:
+    file: /home/tlupu/inception/secrets/db_root_password.txt
+  db_pass:
+    file: /home/tlupu/inception/secrets/db_password.txt
+
+networks:
+  dracula_net:
+    driver: bridge
