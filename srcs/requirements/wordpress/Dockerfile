@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 #Updae and install req dependencies for the mariaDB container && 
 #cleanup unnecessary files

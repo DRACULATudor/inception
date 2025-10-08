@@ -7,7 +7,8 @@ chown -R mysql:mysql /var/run/mysqld /var/lib/mysql
 
 # Read secrets
 ROOT_PASSWORD=$(cat /run/secrets/db_root_pass)
-USER_PASSWORD=$(cat /run/secrets/db_pass)
+REG_USER_PASSWORD=$(cat /run/secrets/db_pass)
+SUPER_USER_PASSWORD=$(cat /run/secrets/wp_admin_pass)
 
 # Only initialize if DB is not already present
 if [ ! -d "/var/lib/mysql/mysql" ]; then
@@ -33,8 +34,10 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     mysql -u root <<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${ROOT_PASSWORD}';
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;
-CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${USER_PASSWORD}';
-GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
+CREATE USER IF NOT EXISTS '${MYSQL_SUPER_USER}'@'%' IDENTIFIED BY '${SUPER_USER_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_SUPER_USER}'@'%';
+CREATE USER IF NOT EXISTS '${MYSQL_REGULAR_USER}'@'%' IDENTIFIED BY '${SUPER_USER_PASSWORD}';
+
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '${ROOT_PASSWORD}' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EOF

@@ -10,21 +10,42 @@ services:
       - /home/tlupu/data/mariadb_vol:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DB}
-      MYSQL_USER: ${MYSQL_USER}
-      # Do NOT pass secret file paths here!
-    env_file:
-      - .env
+      MYSQL_SUPER_USER: ${MYSQL_USER}
+      MYSQL_REGULAR_USER: ${MYSQL_REG_USER}
+    env_file: .env
     networks:
       - dracula_net
     secrets:
       - db_root_pass
       - db_pass
 
+  wordpress:
+    build:
+      context: /home/tlupu/inception/srcs/requirements/wordpress
+      dockerfile: Dockerfile
+    container_name: wordpress
+    ports:
+      - "9000:9000"
+    volumes:
+      - /home/tlupu/data/wp_vol:/var/www/html
+    environment:
+      DB_HOST: ${MYSQL_HOST}
+      DB_NAME: ${MYSQL_DB}
+      DB_USER: ${MYSQL_REG_USER}
+    env_file: .env
+    secrets:
+      - db_pass
+      - wp_admin_pass
+    networks:
+      - dracula_net
+
 secrets:
   db_root_pass:
     file: /home/tlupu/inception/secrets/db_root_password.txt
   db_pass:
     file: /home/tlupu/inception/secrets/db_password.txt
+  wp_admin_pass:
+    file: /home/tlupu/inception/secrets/wp_admin_password.txt
 
 networks:
   dracula_net:
