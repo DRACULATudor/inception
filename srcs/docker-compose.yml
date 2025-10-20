@@ -12,12 +12,14 @@ services:
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_SUPER_USER: ${MYSQL_USER}
       MYSQL_REGULAR_USER: ${MYSQL_REG_USER}
-    env_file: .env
+    env_file: 
+      - .env
     networks:
       - dracula_net
     secrets:
       - db_root_pass
       - db_pass
+      - wp_admin_pass
 
   wordpress:
     build:
@@ -32,12 +34,15 @@ services:
       DB_HOST: ${MYSQL_HOST}
       DB_NAME: ${MYSQL_DB}
       DB_USER: ${MYSQL_REG_USER}
-    env_file: .env
+    env_file: 
+      - .env
     secrets:
       - db_pass
       - wp_admin_pass
     networks:
       - dracula_net
+    depends_on:
+      - mariadb
 
 secrets:
   db_root_pass:
